@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "Instagram Reels Quick Share",
+  "version": "1.0",
+  "description": "Quickly share Instagram Reels with predefined friends using hotkeys",
+  "permissions": [
+    "tabs",
+    "storage",
+    "scripting",
+    "commands"
+  ],
+  "host_permissions": [
+    "https://www.instagram.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.instagram.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "options_page": "options.html",
+  "commands": {
+    "share-to-friend-1": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+1"
+      },
+      "description": "Share to Friend 1"
+    },
+    "share-to-friend-2": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+2"
+      },
+      "description": "Share to Friend 2"
+    }
+  }
+} 
