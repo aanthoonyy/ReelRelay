@@ -1,4 +1,6 @@
-# Reel Chrome Extension
+# ReelRelay
+
+_Spam Reels Faster!_
 
 A Chrome extension that enhances your Instagram Reels experience by providing additional features and functionality.
 
@@ -11,7 +13,7 @@ A Chrome extension that enhances your Instagram Reels experience by providing ad
 1. Clone this repository:
 
 ```bash
-git clone https://github.com/yourusername/reelchromeextension.git
+git clone https://github.com/yourusername/reelrelay.git
 ```
 
 2. Open Chrome and navigate to `chrome://extensions/`
