@@ -6,7 +6,7 @@ A Chrome extension that enhances your Instagram Reels experience by providing ho
 
 ## Demo
 
-![Demo GIF](demo.gif)
+![Demo GIF](reelrelaydemo.gif)
 
 ## Installation
 
