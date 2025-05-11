@@ -2,7 +2,7 @@
 
 _Spam Reels Faster!_
 
-A Chrome extension that enhances your Instagram Reels experience by providing additional features and functionality.
+A Chrome extension that enhances your Instagram Reels experience by providing hotkeys to send reels to your friends!
 
 ## Demo
 
