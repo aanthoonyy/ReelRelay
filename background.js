@@ -1,93 +1,109 @@
-// Listen for keyboard commands
 chrome.commands.onCommand.addListener(async (command) => {
-  // Get the current active tab
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  console.log("[bg] command:", command);
 
-  // Check if we're on Instagram
-  if (!tab.url.includes("instagram.com")) {
-    console.log("Not on Instagram");
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  console.log("[bg] active tab URL:", tab?.url);
+
+  if (!tab?.url.includes("instagram.com")) {
+    console.warn("[bg] not on instagram → abort");
     return;
   }
 
-  // Get the friend mapping from storage
-  const friendNumber = command.split("-").pop(); // Gets "1" or "2" from "share-to-friend-1"
+  const friendNumber = command.split("-").pop();
   const storageKey = `friend${friendNumber}`;
-
-  const result = await chrome.storage.local.get(storageKey);
-  const targetFriend = result[storageKey];
+  const { [storageKey]: targetFriend } = await chrome.storage.local.get(
+    storageKey
+  );
+  console.log("[bg] targetFriend:", targetFriend);
 
   if (!targetFriend) {
-    console.log(`No friend mapped to command ${command}`);
+    console.warn(`[bg] no friend mapped for ${storageKey}`);
     return;
   }
 
-  // Inject the simplified share logic
   try {
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
-      function: shareReel,
+      func: shareReel,
       args: [targetFriend],
     });
-  } catch (error) {
-    console.error("Error executing script:", error);
+    console.log("[bg] injected shareReel");
+  } catch (err) {
+    console.error("[bg] injection failed:", err);
   }
 });
 
-// Simplified content script logic for sharing a reel
 function shareReel(targetFriend) {
-  // --- Helper functions ---
-  function simulateClick(element) {
-    if (!element) return false;
-    try {
-      ["mousedown", "mouseup", "click"].forEach((type) =>
-        element.dispatchEvent(
-          new MouseEvent(type, { bubbles: true, cancelable: true })
-        )
-      );
-      return true;
-    } catch {
-      return false;
-    }
-  }
-  function simulateInput(element, text) {
-    if (!element) return false;
-    try {
-      element.focus();
-      element.value = text;
-      element.dispatchEvent(new Event("input", { bubbles: true }));
-      element.dispatchEvent(new Event("change", { bubbles: true }));
-      return true;
-    } catch {
-      return false;
-    }
+  console.log("[page] shareReel() →", targetFriend);
+
+  function simulateClick(el) {
+    if (!el) return false;
+    ["mousedown", "mouseup", "click"].forEach((type) =>
+      el.dispatchEvent(
+        new MouseEvent(type, { bubbles: true, cancelable: true })
+      )
+    );
+    return true;
   }
 
-  // --- Main logic ---
-  // 1. Find and click the first visible share button
-  let shareButton = document.querySelector(
-    'svg[aria-label="Share"], svg[aria-label="Share Post"]'
+  function simulateInput(el, text) {
+    if (!el) return false;
+    el.focus();
+    el.value = text;
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+    return true;
+  }
+
+  const svgs = Array.from(
+    document.querySelectorAll(
+      'svg[aria-label="Share"], svg[aria-label="Share Post"]'
+    )
   );
-  if (shareButton) {
-    let clickable =
-      shareButton.closest('button, div[role="button"]') ||
-      shareButton.parentElement;
-    simulateClick(clickable);
-  } else {
-    console.log("Share button not found");
+  let bestSvg = null,
+    bestArea = 0;
+  for (const svg of svgs) {
+    const r = svg.getBoundingClientRect();
+    const visW = Math.max(
+      0,
+      Math.min(r.right, window.innerWidth) - Math.max(r.left, 0)
+    );
+    const visH = Math.max(
+      0,
+      Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0)
+    );
+    const area = visW * visH;
+    if (area > bestArea) {
+      bestArea = area;
+      bestSvg = svg;
+    }
+  }
+  if (!bestSvg || bestArea === 0) {
+    console.warn("[page] no visible share icon found");
     return;
   }
+  const shareBtn =
+    bestSvg.closest("button, div[role='button']") || bestSvg.parentElement;
+  if (!shareBtn) {
+    console.warn("[page] could not locate share button wrapper");
+    return;
+  }
+  simulateClick(shareBtn);
+  console.log("[page] clicked share button");
 
-  // 2. Wait for modal, search, and select user
   setTimeout(() => {
     const searchInput = document.querySelector('input[placeholder="Search"]');
-    if (!searchInput) return;
+    if (!searchInput) {
+      console.warn("[page] search input not found");
+      return;
+    }
     const username = targetFriend.startsWith("@")
       ? targetFriend.slice(1)
       : targetFriend;
     simulateInput(searchInput, username);
+    console.log("[page] typed username →", username);
 
     setTimeout(() => {
-      // Find the user row and click the radio/circle
       const userRows = document.querySelectorAll('div[role="button"]');
       let found = false;
       for (const row of userRows) {
@@ -99,15 +115,18 @@ function shareReel(targetFriend) {
             );
             if (!circle) circle = row;
             simulateClick(circle);
+            console.log("[page] clicked user row");
             found = true;
             break;
           }
         }
         if (found) break;
       }
-      if (!found) return;
+      if (!found) {
+        console.warn(`[page] user row not found for ${username}`);
+        return;
+      }
 
-      // 3. Click the Send button
       setTimeout(() => {
         const sendButtons = Array.from(
           document.querySelectorAll('button, div[role="button"]')
@@ -119,7 +138,8 @@ function shareReel(targetFriend) {
         );
         if (sendButton) {
           simulateClick(sendButton);
-          // 4. Close the modal
+          console.log("[page] clicked Send button");
+
           setTimeout(() => {
             const closeButton = document.querySelector(
               'svg[aria-label="Close"], div[aria-label="Close"], button[aria-label="Close"]'
@@ -129,8 +149,11 @@ function shareReel(targetFriend) {
                 closeButton.closest('button, div[role="button"]') ||
                 closeButton.parentElement;
               simulateClick(closeParent || closeButton);
+              console.log("[page] closed modal");
             }
           }, 1000);
+        } else {
+          console.warn("[page] Send button not found");
         }
       }, 1000);
     }, 1000);
