@@ -21,7 +21,9 @@
       "js": ["content.js"]
     }
   ],
-  "options_page": "options.html",
+  "action": {
+    "default_popup": "popup.html"
+  },
   "commands": {
     "share-to-friend-1": {
       "suggested_key": {
@@ -34,6 +36,18 @@
         "default": "Ctrl+Shift+2"
       },
       "description": "Share to Friend 2"
+    },
+    "share-to-friend-3": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+3"
+      },
+      "description": "Share to Friend 3"
+    },
+    "share-to-friend-4": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+4"
+      },
+      "description": "Share to Friend 4"
     }
   }
 } 

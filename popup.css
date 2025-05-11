@@ -1,0 +1,104 @@
+body {
+  width: 300px;
+  height: 400px;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+h1 {
+  font-size: 16px;
+  margin: 0;
+  padding: 16px;
+  color: #262626;
+  background: white;
+  border-bottom: 1px solid #dbdbdb;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px;
+}
+
+.form-group {
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 4px;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: #0095f6;
+}
+
+.shortcut {
+  font-size: 11px;
+  color: #8e8e8e;
+  margin-bottom: 8px;
+}
+
+.footer {
+  padding: 16px;
+  background: white;
+  border-top: 1px solid #dbdbdb;
+  position: sticky;
+  bottom: 0;
+}
+
+button {
+  width: 100%;
+  padding: 8px;
+  background-color: #0095f6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0081d6;
+}
+
+.status {
+  margin-top: 12px;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  display: none;
+  text-align: center;
+}
+
+.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.error {
+  background-color: #f8d7da;
+  color: #721c24;
+} 
