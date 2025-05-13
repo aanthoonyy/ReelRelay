@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Instagram Reels Quick Share",
+  "name": "Reel Relay",
   "version": "1.0",
   "description": "Quickly share Instagram Reels with predefined friends using hotkeys",
   "permissions": [
